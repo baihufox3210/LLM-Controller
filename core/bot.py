@@ -13,7 +13,7 @@ class Bot(commands.Bot):
     async def setup_hook(self):
         await self.load_extensions()
         await self.tree.sync()
-    
+           
     async def load_extensions(self):
         for root, _, files in os.walk("./cogs"):
             for file in files:
@@ -22,7 +22,9 @@ class Bot(commands.Bot):
                     extension = rel_path.replace(os.sep, ".")[:-3]
                     
                     try: await super().load_extension(extension)
-                    except Exception as e: self.logger.error("Extension Load Failed", traceback.format_exc())
+                    except Exception as e: 
+                        print(f"[LOAD FAIL] {extension}")
+                        traceback.print_exc()
     
     async def on_ready(self): pass
     async def close(self): await super().close()
