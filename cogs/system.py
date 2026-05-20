@@ -6,6 +6,8 @@ import pathlib
 import asyncio
 import signal
 
+import traceback
+
 from typing import List
 
 import discord
@@ -79,7 +81,12 @@ class LLMController(commands.Cog):
             return f"`{'▬' * filled_blocks}{'○' * empty_blocks}` `{percentage:.2f}%`"
 
         try:
-            async with aiohttp.ClientSession() as session:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+            timeout = aiohttp.ClientTimeout(total = None, connect = 60, sock_connect = None)
+
+            async with aiohttp.ClientSession(headers = headers, timeout = timeout) as session:
                 async with session.get(model_url) as response:
                     if response.status != 200:
                         return await interaction.followup.send(
@@ -137,7 +144,7 @@ class LLMController(commands.Cog):
             await interaction.followup.send(
                 embed = discord.Embed(
                     title = "Download Failed",
-                    description = f"An error occurred while downloading the model: {e}",
+                    description = f"An error occurred while downloading the model: {traceback.format_exc()}",
                     color = discord.Color.red()
                 )
             )
